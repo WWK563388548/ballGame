@@ -27,6 +27,14 @@ function calculateMousePos(evt) {
     };
 }
 
+function handleMouseClick(evt) {
+    if(showingWinScreen) {
+        player1Score = 0;
+        player2Score = 0;
+        showingWinScreen = false;
+    }
+}
+
 window.onload = function() {
     // 创建 context 对象: context 对象是内建的 HTML5 对象，
     // 拥有多种绘制路径、矩形、圆形、字符以及添加图像的方法。
@@ -39,17 +47,16 @@ window.onload = function() {
             drawEverything();   
         }, 1000/framesPerSecond);
 
-    canvas.addEventListener('mousemove',
-        function(evt) {
+    canvas.addEventListener('mousedown', handleMouseClick);
+
+    canvas.addEventListener('mousemove', function(evt) {
             var mousePos = calculateMousePos(evt);
             paddle1Y = mousePos.y - (PADDLE_HEIGHT / 2);
-        });
+    });
 }
 
 function ballReset() {
     if(player1Score >= WIN_SCORE || player2Score >= WIN_SCORE) {
-        player1Score = 0;
-        player2Score = 0;
         showingWinScreen = true;
     }
     ballSpeedX = -ballSpeedX;
@@ -107,6 +114,12 @@ function moveEverything() {
     }
 }
 
+function drawCenterLine() {
+    for(var i = 0; i < canvas.height; i += 40) {
+        colorRect(canvas.width / 2 - 1, i, 2, 20, 'white');
+    }
+}
+
 // fillRect 方法拥有参数(225,210,200,200)
 // 在画布上绘制 200x200 的矩形，从坐标(225,210)开始
 function drawEverything() {
@@ -114,10 +127,17 @@ function drawEverything() {
     colorRect(0, 0, canvas.width, canvas.height, 'black');
 
     if(showingWinScreen) {
-        canvasContext.fillStyle = 'white'
-        canvasContext.fillText("点击鼠标，开始新的游戏！", 100, 100);
+        canvasContext.fillStyle = 'white';
+        if(player1Score >= WIN_SCORE){
+            canvasContext.fillText("你赢了!", 350, 200);
+        } else if (player2Score >= WIN_SCORE) {
+            canvasContext.fillText("很遗憾，电脑获胜!", 350, 200);
+        }
+        canvasContext.fillText("点击鼠标，开始新的游戏！", 350, 500);
         return;
     }
+    // Center line
+    drawCenterLine();
 
     // Left player's paddle
     colorRect(0, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'white');
