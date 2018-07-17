@@ -67,6 +67,9 @@ function moveEverything() {
     if(ballX < 0) {
         if(ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT) {
             ballSpeedX = -ballSpeedX;
+            // 通过击打的位置去控制球移动的方向
+            var deltaY = ballY - (paddle1Y + PADDLE_HEIGHT / 2);
+            ballSpeedY = deltaY * 0.35;
         } else {
             ballReset();
             player2Score++;
@@ -75,6 +78,8 @@ function moveEverything() {
     if(ballX > canvas.width) {
         if(ballY > paddle2Y && ballY < paddle2Y + PADDLE_HEIGHT) {
             ballSpeedX = -ballSpeedX;
+            var deltaY = ballY - (paddle2Y + PADDLE_HEIGHT / 2);
+            ballSpeedY = deltaY * 0.35;
         } else {
             ballReset();    
             player1Score++;
