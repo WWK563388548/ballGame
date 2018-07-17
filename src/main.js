@@ -5,9 +5,14 @@ var ballY = 50;
 var ballSpeedX = 10;
 var ballSpeedY = 4;
 
+var player1Score = 0;
+var player2Score = 0;
+
 var paddle1Y = 250;
+var paddle2Y = 250;
 // This value is a constant
 var PADDLE_HEIGHT = 100;
+var PADDLE_THICKNESS = 10;
 
 function calculateMousePosition(event) {
 
@@ -24,34 +29,60 @@ function calculateMousePosition(event) {
 window.onload = function() {
 
     var framesPerSecond = 30;
-    console.log("Loading....");
     canvas = document.getElementById("gameCanvas");
 
     // 创建 context 对象: context 对象是内建的 HTML5 对象，
     // 拥有多种绘制路径、矩形、圆形、字符以及添加图像的方法。
     canvasContext = canvas.getContext('2d');
     setInterval(function() {
-        drawEverything();
         moveEverything();
+        drawEverything();
     }, 1000/framesPerSecond);
 
-    canvas.addEventListener('mousemove', function(evt) {
-		var mousePos = calculateMousePosition(evt);
+    canvas.addEventListener('mousemove', function(event) {
+		var mousePos = calculateMousePosition(event);
 		paddle1Y = mousePos.y - (PADDLE_HEIGHT/2);
 	});  
 }
 
+function ballReset() {
+	ballSpeedX = -ballSpeedX;
+	ballX = canvas.width/2;
+	ballY = canvas.height/2;
+}
+
+function calculateMovement() {
+    var paddle2YCenter = paddle2Y + (PADDLE_HEIGHT/2);
+    if(paddle2YCenter < ballY - 35) {
+		paddle2Y = paddle2Y + 6;
+	} else if(paddle2YCenter > ballY + 35) {
+		paddle2Y = paddle2Y - 6;
+	}
+}
+
 function moveEverything() {
+    
+    calculateMovement();
 
     ballX = ballX + ballSpeedX;
     ballX = ballY + ballSpeedY;
 
     if(ballX < 0) {
-        ballSpeedX = -ballSpeedX;
+        if(ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT) {
+			ballSpeedX = -ballSpeedX;
+		} else {
+            ballReset();
+            player2Score++;	
+		}
     }
 
     if(ballX > canvas.width) {
-        ballSpeedX = -ballSpeedX;
+        if(ballY > paddle2Y && ballY < paddle2Y + PADDLE_HEIGHT) {
+			ballSpeedX = -ballSpeedX;
+		} else {
+            ballReset();
+            player1Score++;	
+		}
     }
 
     if(ballY < 0) {
@@ -71,9 +102,14 @@ function drawEverything() {
     // Background
     colorRect(0, 0, canvas.width, canvas.height, 'black');
     // Left player's paddle
-    colorRect(0, paddle1Y, 10, PADDLE_HEIGHT, 'white');
+    colorRect(0, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'white');
+    // Left player's paddle
+    colorRect(canvas.width - PADDLE_THICKNESS, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'white');
     // Just a ball
     colorCircle(ballX, ballY, 10, 'white');
+
+    canvasContext.fillText(player1Score, 100, 100);
+	canvasContext.fillText(player2Score, canvas.width - 100, 100);
 }
 
 function colorCircle(centerX, centerY, radius, drawColor) {
