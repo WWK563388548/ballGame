@@ -1,8 +1,25 @@
 var canvas;
 var canvasContext;
 var ballX = 50;
+var ballY = 50;
 var ballSpeedX = 10;
+var ballSpeedY = 4;
 
+var paddle1Y = 250;
+// This value is a constant
+var PADDLE_HEIGHT = 100;
+
+function calculateMousePosition(event) {
+
+    var rect = canvas.getBoundingClientRect();
+	var root = document.documentElement;
+	var mouseX = event.clientX - rect.left - root.scrollLeft;
+	var mouseY = event.clientY - rect.top - root.scrollTop;
+	return {
+		x:mouseX,
+		y:mouseY
+	};
+}
 
 window.onload = function() {
 
@@ -16,18 +33,35 @@ window.onload = function() {
     setInterval(function() {
         drawEverything();
         moveEverything();
-    }, 1000/framesPerSecond);  
+    }, 1000/framesPerSecond);
+
+    canvas.addEventListener('mousemove', function(evt) {
+		var mousePos = calculateMousePosition(evt);
+		paddle1Y = mousePos.y - (PADDLE_HEIGHT/2);
+	});  
 }
 
 function moveEverything() {
 
     ballX = ballX + ballSpeedX;
+    ballX = ballY + ballSpeedY;
+
     if(ballX < 0) {
         ballSpeedX = -ballSpeedX;
     }
+
     if(ballX > canvas.width) {
         ballSpeedX = -ballSpeedX;
     }
+
+    if(ballY < 0) {
+		ballSpeedY = -ballSpeedY;
+    }
+    
+	if(ballY > canvas.height) {
+		ballSpeedY = -ballSpeedY;
+	}
+    
 }
 
 // fillRect 方法拥有参数(225,210,200,200)
@@ -35,11 +69,11 @@ function moveEverything() {
 function drawEverything() {
 
     // Background
-    colorRect(0,0,canvas.width,canvas.height,'black');
+    colorRect(0, 0, canvas.width, canvas.height, 'black');
     // Left player's paddle
-    colorRect(0, 210, 10, 100, 'white');
+    colorRect(0, paddle1Y, 10, PADDLE_HEIGHT, 'white');
     // Just a ball
-    colorCircle(ballX, 150, 10, 'white');
+    colorCircle(ballX, ballY, 10, 'white');
 }
 
 function colorCircle(centerX, centerY, radius, drawColor) {
