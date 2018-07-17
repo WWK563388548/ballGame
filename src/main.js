@@ -7,6 +7,9 @@ var ballSpeedY = 4;
 
 var player1Score = 0;
 var player2Score = 0;
+const WIN_SCORE = 3;
+
+var showingWinScreen = false;
 
 var paddle1Y = 250;
 var paddle2Y = 250;
@@ -44,6 +47,11 @@ window.onload = function() {
 }
 
 function ballReset() {
+    if(player1Score >= WIN_SCORE || player2Score >= WIN_SCORE) {
+        player1Score = 0;
+        player2Score = 0;
+        showingWinScreen = true;
+    }
     ballSpeedX = -ballSpeedX;
     ballX = canvas.width / 2;
     ballY = canvas.height / 2;
@@ -59,6 +67,11 @@ function computerMovement() {
 }
 
 function moveEverything() {
+
+    if(showingWinScreen) {
+        return;
+    }
+
     computerMovement();
 
     ballX = ballX + ballSpeedX;
@@ -71,8 +84,9 @@ function moveEverything() {
             var deltaY = ballY - (paddle1Y + PADDLE_HEIGHT / 2);
             ballSpeedY = deltaY * 0.35;
         } else {
+            // Must be before ballReset()
+            player2Score++; 
             ballReset();
-            player2Score++;
         }
     }
     if(ballX > canvas.width) {
@@ -81,8 +95,8 @@ function moveEverything() {
             var deltaY = ballY - (paddle2Y + PADDLE_HEIGHT / 2);
             ballSpeedY = deltaY * 0.35;
         } else {
-            ballReset();    
             player1Score++;
+            ballReset();    
         }
     }
     if(ballY < 0) {
@@ -98,6 +112,12 @@ function moveEverything() {
 function drawEverything() {
     // Background
     colorRect(0, 0, canvas.width, canvas.height, 'black');
+
+    if(showingWinScreen) {
+        canvasContext.fillStyle = 'white'
+        canvasContext.fillText("点击鼠标，开始新的游戏！", 100, 100);
+        return;
+    }
 
     // Left player's paddle
     colorRect(0, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'white');
